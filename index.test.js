@@ -1,12 +1,22 @@
 import { base64 } from '@scure/base'
 import * as secp from '@noble/secp256k1'
+import * as bip39 from '@scure/bip39'
+import { HDKey } from '@scure/bip32'
 import { bytesToHex } from '@noble/hashes/utils'
 import * as wif from 'wif'
 import { recoverPublicKey, sign, __armorMessageHash } from './utils'
 import TEST_VECTORS from './test_vectors'
 
 describe('BIP-0046', () => {
-    it(`should verify private key (m/84'/0'/0'/2/0)`, async () => {
+    it(`should verify xpriv/xpub`, async () => {
+        const seed = await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic)
+        const hdkey = HDKey.fromMasterSeed(seed)
+        
+        expect(hdkey.privateExtendedKey).toBe(TEST_VECTORS.rootpriv)
+        expect(hdkey.publicExtendedKey).toBe(TEST_VECTORS.rootpub)
+    })
+
+    it(`should verify private key (m/84'/0'/0'/2/0)`, () => {
         const privateKey = wif.decode(TEST_VECTORS.first_derived_private_key).privateKey
         expect(bytesToHex(privateKey)).toBe('a91720ac2166678a3020a89db803b038e1a1549b88af8751b89c5efddfa99f67')
     })
@@ -26,7 +36,7 @@ describe('BIP-0046', () => {
         expect(recoveredPubkey.toHex()).toBe(TEST_VECTORS.first_derived_public_key)
     })
 
-    it(`should verify message hash for first certificate`, async () => {
+    it(`should verify message hash for first certificate`, () => {
         expect(bytesToHex(__armorMessageHash(TEST_VECTORS.first_cert_message))).toBe('b35542aaf7c0acdb9ab3a9c48197d9bc323dd45d66afca33d226643356ff023a')
     })
 
@@ -40,7 +50,7 @@ describe('BIP-0046', () => {
         expect(base64.encode(signature)).toBe(TEST_VECTORS.first_cert_signature)
     })
 
-    it(`should verify message hash for example bond certificate`, async () => {
+    it(`should verify message hash for example bond certificate`, () => {
         expect(bytesToHex(__armorMessageHash(TEST_VECTORS.example_bond_certificate_message))).toBe('0bf60ceb8c54f310460710ce2f782d4f9e53fdfd4e9230032e53fb814a6ee176')
     })
 
