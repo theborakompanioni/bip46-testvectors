@@ -78,6 +78,7 @@ const recoverPublicKey = (message, signature) => {
 }
 
 export {
+    armorMessageHash as __armorMessageHash,
     recoverPublicKey,
     sign
 }
