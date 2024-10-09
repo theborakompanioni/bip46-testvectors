@@ -1,7 +1,34 @@
 import * as secp from '@noble/secp256k1'
 import { sha256 } from '@noble/hashes/sha256'
 import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils'
+import { networks, script, opcodes, payments } from 'bitcoinjs-lib'
 import * as varint from 'varuint-bitcoin'
+
+const redeemscriptAddressFromPublicKey = (nLockTime, publicKey, network) => {   
+    // If the nLockTime is less than 500 million, it is interpreted as a blockheight.
+    // If the nLockTime is 500 million or more, it is interpreted as a UNIX timestamp.
+    if (nLockTime < 500_000_000) {
+        throw new Error(`Unexpected value of nLockTime: Must be greater or equal to 500_000_000, got ${nLockTime}`)
+    } 
+    if (publicKey.length !== 33) {
+        throw new Error(`Unexpected length of public key: Must be 33 bytes, got ${publicKey.length}`)
+    }
+    if (network !== 'bitcoin' && network !== 'testnet' && network !== 'regtest' && network !== undefined) {
+        throw new Error(`Unexpected value of network: Must be one of "bitcoin", "testnet" or "regtest", got ${nLockTime}`)
+    }
+    const _network = network === 'regtest' ? networks.regtest : (network === 'testnet' ? networks.testnet : networks.bitcoin)
+    
+    // <timelock> OP_CHECKLOCKTIMEVERIFY OP_DROP <derived_key> OP_CHECKSIG
+    const locking_script = script.compile([
+        script.number.encode(nLockTime),
+        opcodes.OP_CHECKLOCKTIMEVERIFY,
+        opcodes.OP_DROP,
+        publicKey,
+        opcodes.OP_CHECKSIG,
+      ])
+    const p2wsh = payments.p2wsh({ redeem: { output: locking_script, network: _network }, network: _network })
+    return p2wsh.address
+}
 
 const armorMessage = (message) => {
     const prefix_bytes = utf8ToBytes("\x18Bitcoin Signed Message:\n")
@@ -34,9 +61,9 @@ const sign = async (message, privateKey, type) => {
     const signature = await secp.signAsync(message_hash, privateKey)
     const signature_bytes = signature.toCompactRawBytes()
 
-    const type_constant = (type && SIG_RECOVERY_TYPE[type]) || SIG_RECOVERY_TYPE['P2PKH_compressed']
+    const _type = (type && SIG_RECOVERY_TYPE[type]) || SIG_RECOVERY_TYPE['P2PKH_compressed']
 
-    const header_number = type_constant + signature.recovery
+    const header_number = _type + signature.recovery
 
     const header_bytes = hexToBytes(Number(header_number).toString(16))
 
@@ -78,6 +105,7 @@ const recoverPublicKey = (message, signature) => {
 }
 
 export {
+    redeemscriptAddressFromPublicKey,
     armorMessageHash as __armorMessageHash,
     recoverPublicKey,
     sign
