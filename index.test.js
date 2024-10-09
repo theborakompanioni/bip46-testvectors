@@ -16,11 +16,19 @@ describe('BIP-0046', () => {
         expect(hdkey.publicExtendedKey).toBe(TEST_VECTORS.rootpub)
     })
 
-    it(`should verify private key (m/84'/0'/0'/2/0)`, () => {
-        const privateKey = wif.decode(TEST_VECTORS.first_derived_private_key).privateKey
-        expect(bytesToHex(privateKey)).toBe('a91720ac2166678a3020a89db803b038e1a1549b88af8751b89c5efddfa99f67')
-    })
+    it(`should verify keys (m/84'/0'/0'/2/0)`, async () => {
+        const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
 
+        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/0`)
+        expect(wif.encode({
+            version: parseInt('0x80'),
+            privateKey: derivedKey.privateKey,
+            compressed: true
+        })).toBe(TEST_VECTORS.first_derived_private_key)
+        expect(bytesToHex(derivedKey.privateKey)).toBe('a91720ac2166678a3020a89db803b038e1a1549b88af8751b89c5efddfa99f67')
+        expect(bytesToHex(derivedKey.publicKey)).toBe(TEST_VECTORS.first_derived_public_key)
+    })
+  
     it(`should verify pubkey from private key (m/84'/0'/0'/2/0)`, () => {
         const privateKey = wif.decode(TEST_VECTORS.first_derived_private_key).privateKey
         const recoveredPubkey = secp.getPublicKey(privateKey)
@@ -44,8 +52,6 @@ describe('BIP-0046', () => {
         const message = TEST_VECTORS.first_cert_message
         const privateKey = wif.decode(TEST_VECTORS.first_derived_private_key).privateKey
         const signature = await sign(message, privateKey)
-
-        console.log(bytesToHex(signature))
 
         expect(base64.encode(signature)).toBe(TEST_VECTORS.first_cert_signature)
     })
