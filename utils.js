@@ -1,15 +1,16 @@
 import * as secp from '@noble/secp256k1'
 import { sha256 } from '@noble/hashes/sha256'
-import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils'
+import { utf8ToBytes } from '@noble/hashes/utils'
+import * as varint from 'varuint-bitcoin'
 
 const sign = async (message, privateKey) => {
     const prefix_bytes = utf8ToBytes("\x18Bitcoin Signed Message:\n")
     const message_bytes = utf8ToBytes(message)
-    const length_bytes = hexToBytes(Number(message_bytes.length).toString(16))
+    const length_bytes = varint.encode(message_bytes.length).buffer
 
     const prefixed_message_raw = new Uint8Array(prefix_bytes.length + length_bytes.length + message_bytes.length)
     prefixed_message_raw.set(prefix_bytes)
-    prefixed_message_raw.set(hexToBytes(Number(message_bytes.length).toString(16)), prefix_bytes.length)
+    prefixed_message_raw.set(length_bytes, prefix_bytes.length)
     prefixed_message_raw.set(message_bytes, prefix_bytes.length + length_bytes.length)
 
     const message_hash = sha256(sha256(prefixed_message_raw))
@@ -40,23 +41,11 @@ const recoverPublicKey = (message, signature) => {
 
     const prefix_bytes = utf8ToBytes("\x18Bitcoin Signed Message:\n")
     const message_bytes = utf8ToBytes(message)
-    const length_bytes = hexToBytes(Number(message_bytes.length).toString(16))
-
-    if (length_bytes.length !== 1) {
-        // TODO: implement CompactSize (https://bitcoin.stackexchange.com/questions/114584/what-is-the-different-between-compactsize-and-varint-encoding)
-        /**
-         *   The "CompactSize" encoding (also known as "VarInt" outside Bitcoin Core):
-         *   0..0xfc: 1 byte (the value itself)
-         *   0xfd..0xffff: 3 bytes (0xfd + 2 byte little endian encoding)
-         *   0x10000..0xffffffff: 5 bytes (0xfe + 4 byte little endian encoding)
-         *   0x100000000..0xffffffffffffffff: 9 bytes (0xff + 8 byte little endian encoding)
-         */
-        throw new Error('Only messages with 1 byte length values are currently supported')
-    }
+    const length_bytes = varint.encode(message_bytes.length).buffer
 
     const prefixed_message_raw = new Uint8Array(prefix_bytes.length + length_bytes.length + message_bytes.length)
     prefixed_message_raw.set(prefix_bytes)
-    prefixed_message_raw.set(hexToBytes(Number(message_bytes.length).toString(16)), prefix_bytes.length)
+    prefixed_message_raw.set(length_bytes, prefix_bytes.length)
     prefixed_message_raw.set(message_bytes, prefix_bytes.length + length_bytes.length)
 
     const message_hash = sha256(sha256(prefixed_message_raw))
