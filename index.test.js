@@ -21,6 +21,14 @@ describe('BIP-0046', () => {
         expect(recoveredPubkey.toHex()).toBe(TEST_VECTORS.first_derived_public_key)
     })
 
+    it(`should verify signature for example bond certificate`, async () => {
+        const message = TEST_VECTORS.example_bond_certificate_message
+        const privateKey = wif.decode(TEST_VECTORS.first_derived_private_key).privateKey
+        const signature = await sign(message, privateKey)
+
+        expect(base64.encode(signature)).toBe(TEST_VECTORS.example_bond_certificate_signature)
+    })
+
     it(`should recover public key from signature for example bond certificate`, () => {
         const message = TEST_VECTORS.example_bond_certificate_message
         const signatures = base64.decode(TEST_VECTORS.example_bond_certificate_signature)
