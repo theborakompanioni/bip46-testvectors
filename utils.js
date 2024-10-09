@@ -8,16 +8,19 @@ const utf8ToBytes = (str) => {
     return binaryArray
 }
 
+const sign = (message, privateKey) => {
+    
+}
+
 const recoverPublicKey = (message, signature) => {
     if (signature.length !== 65) {
         throw new Error(`Signature length out of range: Must be 65 bytes, got ${signature.length}`)
     }
 
-    const headerByte = signature.subarray(0, 1)
+    const headerInt = Buffer.from(signature.subarray(0, 1)).readInt8(0)
     const sigBytes = signature.subarray(1, 65)
 
-    const recoveryId = ((headerByte) => {
-        const headerInt = parseInt(headerByte.toString('hex'), 16)
+    const recoveryId = ((headerInt) => {
         if (headerInt < 27 || headerInt > 42) {
             throw new Error(`Header byte out of range: Must be between 27 and 42, got ${headerInt}`)
         }
@@ -26,17 +29,18 @@ const recoverPublicKey = (message, signature) => {
         if(headerInt >= 35) return headerInt - 8 - 27
         if(headerInt >= 31) return headerInt - 4 - 27
         return headerInt - 27
-    })(headerByte)
+    })(headerInt)
 
     const sigWithRecovery = secp.Signature.fromCompact(sigBytes).addRecoveryBit(recoveryId).assertValidity()
 
     const prefix_bytes = utf8ToBytes("\x18Bitcoin Signed Message:\n")
     const message_bytes = utf8ToBytes(message)
+    const length_bytes = hexToBytes(Number(message_bytes.length).toString(16))
 
-    const prefixed_message_raw = new Uint8Array(prefix_bytes.length + 1 + message_bytes.length)
+    const prefixed_message_raw = new Uint8Array(prefix_bytes.length + length_bytes.length + message_bytes.length)
     prefixed_message_raw.set(prefix_bytes)
     prefixed_message_raw.set(hexToBytes(Number(message_bytes.length).toString(16)), prefix_bytes.length)
-    prefixed_message_raw.set(message_bytes, prefix_bytes.length + 1)
+    prefixed_message_raw.set(message_bytes, prefix_bytes.length + length_bytes.length)
 
     const message_hash = sha256(sha256(prefixed_message_raw))
 
@@ -45,4 +49,5 @@ const recoverPublicKey = (message, signature) => {
 
 export {
     recoverPublicKey,
+    sign
 }
