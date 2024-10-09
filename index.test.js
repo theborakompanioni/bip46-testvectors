@@ -5,7 +5,7 @@ import { HDKey } from '@scure/bip32'
 import { bytesToHex } from '@noble/hashes/utils'
 import { networks } from 'bitcoinjs-lib'
 import * as wif from 'wif'
-import { redeemscriptAddressFromPublicKey, recoverPublicKey, sign, __armorMessageHash } from './utils'
+import { timelockedAddressFromLocktimeAndPublicKey, recoverPublicKey, sign, __armorMessageHash } from './utils'
 import TEST_VECTORS from './test_vectors'
 
 describe('BIP-0046', () => {
@@ -34,7 +34,7 @@ describe('BIP-0046', () => {
         const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
 
         const derivedKey = hdkey.derive(`m/84'/0'/0'/2/0`)
-        const address = redeemscriptAddressFromPublicKey(1577836800, derivedKey.publicKey)
+        const address = timelockedAddressFromLocktimeAndPublicKey(TEST_VECTORS.first_unix_locktime, derivedKey.publicKey)
 
         expect(address).toBe(TEST_VECTORS.first_address)
     })
@@ -50,6 +50,15 @@ describe('BIP-0046', () => {
         })).toBe(TEST_VECTORS.second_derived_private_key)
         expect(bytesToHex(derivedKey.privateKey)).toBe('29c2f965ba6375d902c2e800550b7bd8d9b46b6ba9a55edcd5f6811dc97b9b48')
         expect(bytesToHex(derivedKey.publicKey)).toBe(TEST_VECTORS.second_derived_public_key)
+    })
+
+    it(`should verify timelocked address (m/84'/0'/0'/2/1)`, async () => {
+        const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
+
+        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/1`)
+        const address = timelockedAddressFromLocktimeAndPublicKey(TEST_VECTORS.second_unix_locktime, derivedKey.publicKey)
+
+        expect(address).toBe(TEST_VECTORS.second_address)
     })
 
     it(`should verify keys (m/84'/0'/0'/2/959)`, async () => {

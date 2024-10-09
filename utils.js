@@ -4,7 +4,7 @@ import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils'
 import { networks, script, opcodes, payments } from 'bitcoinjs-lib'
 import * as varint from 'varuint-bitcoin'
 
-const redeemscriptAddressFromPublicKey = (nLockTime, publicKey, network) => {   
+const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, network) => {   
     // If the nLockTime is less than 500 million, it is interpreted as a blockheight.
     // If the nLockTime is 500 million or more, it is interpreted as a UNIX timestamp.
     if (nLockTime < 500_000_000) {
@@ -105,7 +105,7 @@ const recoverPublicKey = (message, signature) => {
 }
 
 export {
-    redeemscriptAddressFromPublicKey,
+    timelockedAddressFromLocktimeAndPublicKey,
     armorMessageHash as __armorMessageHash,
     recoverPublicKey,
     sign
