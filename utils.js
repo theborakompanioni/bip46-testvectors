@@ -3,14 +3,7 @@ import { sha256 } from '@noble/hashes/sha256'
 import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils'
 import * as varint from 'varuint-bitcoin'
 
-const SIG_RECOVERY_TYPE = {
-    'P2PKH_uncompressed': 27,
-    'P2PKH_compressed': 31,
-    'Segwit_P2SH': 35,
-    'Segwit_Bech32': 39
-}
-
-const sign = async (message, privateKey, type) => {
+const armorMessage = (message) => {
     const prefix_bytes = utf8ToBytes("\x18Bitcoin Signed Message:\n")
     const message_bytes = utf8ToBytes(message)
     const length_bytes = varint.encode(message_bytes.length).buffer
@@ -20,7 +13,23 @@ const sign = async (message, privateKey, type) => {
     prefixed_message_raw.set(length_bytes, prefix_bytes.length)
     prefixed_message_raw.set(message_bytes, prefix_bytes.length + length_bytes.length)
 
-    const message_hash = sha256(sha256(prefixed_message_raw))
+    return prefixed_message_raw
+}
+
+const armorMessageHash = (message) => {
+    const prefixed_message_raw = armorMessage(message)
+    return sha256(sha256(prefixed_message_raw))
+}
+
+const SIG_RECOVERY_TYPE = {
+    'P2PKH_uncompressed': 27,
+    'P2PKH_compressed': 31,
+    'Segwit_P2SH': 35,
+    'Segwit_Bech32': 39
+}
+
+const sign = async (message, privateKey, type) => {
+    const message_hash = armorMessageHash(message)
 
     const signature = await secp.signAsync(message_hash, privateKey)
     const signature_bytes = signature.toCompactRawBytes()
@@ -63,16 +72,7 @@ const recoverPublicKey = (message, signature) => {
 
     const sigWithRecovery = secp.Signature.fromCompact(sigBytes).addRecoveryBit(recoveryId).assertValidity()
 
-    const prefix_bytes = utf8ToBytes("\x18Bitcoin Signed Message:\n")
-    const message_bytes = utf8ToBytes(message)
-    const length_bytes = varint.encode(message_bytes.length).buffer
-
-    const prefixed_message_raw = new Uint8Array(prefix_bytes.length + length_bytes.length + message_bytes.length)
-    prefixed_message_raw.set(prefix_bytes)
-    prefixed_message_raw.set(length_bytes, prefix_bytes.length)
-    prefixed_message_raw.set(message_bytes, prefix_bytes.length + length_bytes.length)
-
-    const message_hash = sha256(sha256(prefixed_message_raw))
+    const message_hash = armorMessageHash(message)
 
     return sigWithRecovery.recoverPublicKey(message_hash)
 }
