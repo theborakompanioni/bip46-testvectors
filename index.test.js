@@ -5,7 +5,7 @@ import { HDKey } from '@scure/bip32'
 import { bytesToHex } from '@noble/hashes/utils'
 import { networks } from 'bitcoinjs-lib'
 import * as wif from 'wif'
-import { timelockedAddressFromLocktimeAndPublicKey, recoverPublicKey, sign, __armorMessageHash } from './utils'
+import { indexToLocktime, timelockedAddressFromLocktimeAndPublicKey, recoverPublicKey, sign, __armorMessageHash } from './utils'
 import TEST_VECTORS from './test_vectors'
 
 describe('BIP-0046', () => {
@@ -39,9 +39,13 @@ describe('BIP-0046', () => {
 
     it(`should verify timelocked address (m/84'/0'/0'/2/0)`, async () => {
         const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
+        
+        const index = 0
+        const locktime = indexToLocktime(index)
+        expect(locktime).toBe(TEST_VECTORS.first_unix_locktime)
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/0`)
-        const address = timelockedAddressFromLocktimeAndPublicKey(TEST_VECTORS.first_unix_locktime, derivedKey.publicKey)
+        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
+        const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey)
 
         expect(address).toBe(TEST_VECTORS.first_address)
     })
@@ -62,7 +66,11 @@ describe('BIP-0046', () => {
     it(`should verify timelocked address (m/84'/0'/0'/2/1)`, async () => {
         const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/1`)
+        const index = 1
+        const locktime = indexToLocktime(index)
+        expect(locktime).toBe(TEST_VECTORS.second_unix_locktime)
+
+        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
         const address = timelockedAddressFromLocktimeAndPublicKey(TEST_VECTORS.second_unix_locktime, derivedKey.publicKey)
 
         expect(address).toBe(TEST_VECTORS.second_address)
@@ -83,8 +91,12 @@ describe('BIP-0046', () => {
 
     it(`should verify timelocked address (m/84'/0'/0'/2/959)`, async () => {
         const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
+        
+        const index = 959
+        const locktime = indexToLocktime(index)
+        expect(locktime).toBe(TEST_VECTORS.last_unix_locktime)
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/959`)
+        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
         const address = timelockedAddressFromLocktimeAndPublicKey(TEST_VECTORS.last_unix_locktime, derivedKey.publicKey)
 
         expect(address).toBe(TEST_VECTORS.last_address)

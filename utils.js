@@ -4,12 +4,22 @@ import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils'
 import { networks, script, opcodes, payments } from 'bitcoinjs-lib'
 import * as varint from 'varuint-bitcoin'
 
+const indexToLocktime = (index) => {
+    if (index < 0 || index > 959) {
+        throw new Error(`Unexpected value of index: Must be between 0 and 959, got ${index}`)
+    }
+    const year = 2020 + Math.floor(index / 12)
+    const month = 1 + index % 12
+    const day = 1
+    return Date.UTC(year, month - 1, day, 0, 0, 0, 0) / 1_000
+}
+
 const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, network) => {   
     // If the nLockTime is less than 500 million, it is interpreted as a blockheight.
     // If the nLockTime is 500 million or more, it is interpreted as a UNIX timestamp.
     if (nLockTime < 500_000_000) {
         throw new Error(`Unexpected value of nLockTime: Must be greater or equal to 500_000_000, got ${nLockTime}`)
-    } 
+    }
     if (publicKey.length !== 33) {
         throw new Error(`Unexpected length of public key: Must be 33 bytes, got ${publicKey.length}`)
     }
@@ -105,6 +115,7 @@ const recoverPublicKey = (message, signature) => {
 }
 
 export {
+    indexToLocktime,
     timelockedAddressFromLocktimeAndPublicKey,
     armorMessageHash as __armorMessageHash,
     recoverPublicKey,
