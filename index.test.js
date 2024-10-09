@@ -9,4 +9,12 @@ describe('BIP-0046', () => {
 
         expect(recoveredPubkey.toHex()).toBe(TEST_VECTORS.first_derived_public_key)
     })
+
+    it(`should recover public key from signature for example bond certificate`, () => {
+        const message = TEST_VECTORS.example_bond_certificate_message
+        const signatures = Buffer.from(TEST_VECTORS.example_bond_certificate_signature, 'base64')
+        const recoveredPubkey = recoverPublicKey(message, signatures)
+
+        expect(recoveredPubkey.toHex()).toBe(TEST_VECTORS.first_derived_public_key)
+    })
 })

@@ -21,4 +21,12 @@ export default {
     first_cert_message: 'fidelity-bond-cert|020000000000000000000000000000000000000000000000000000000000000001|375',
     first_cert_p2pkh_address: '16vmiGpY1rEaYnpGgtG7FZgr2uFCpeDgV6',
     first_cert_signature: 'H2b/90XcKnIU/D1nSCPhk8OcxrHebMCr4Ok2d2yDnbKDTSThNsNKA64CT4v2kt+xA1JmGRG/dMnUUH1kKqCVSHo=',
+
+    // Test certificate and endpoint signing using the first timelocked address = m/84'/0'/0'/2/0 (see above)
+    example_bond_certificate_private_key: 'KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d',
+    example_bond_certificate_public_key: '0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c',
+    example_bond_certificate_p2pkh_address: '1JaUQDVNRdhfNsVncGkXedaPSM5Gc54Hso',
+
+    example_bond_certificate_message: 'fidelity-bond-cert|0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c|375',
+    example_bond_certificate_signature: 'INOP3cB9UW7F1e1Aglj8rI9QhnyxmgWDEPt+nOMvl7hJJne7rH/KCNDYvLiqNuB9qWaWUojutjRsgPJrvyDQ+0Y=',
 }
