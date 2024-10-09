@@ -26,7 +26,9 @@ export default {
     example_bond_certificate_private_key: 'KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d',
     example_bond_certificate_public_key: '0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c',
     example_bond_certificate_p2pkh_address: '1JaUQDVNRdhfNsVncGkXedaPSM5Gc54Hso',
-
     example_bond_certificate_message: 'fidelity-bond-cert|0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c|375',
     example_bond_certificate_signature: 'INOP3cB9UW7F1e1Aglj8rI9QhnyxmgWDEPt+nOMvl7hJJne7rH/KCNDYvLiqNuB9qWaWUojutjRsgPJrvyDQ+0Y=',
+    // example endpoint signing two IRC nicknames (used in JoinMarket)
+    example_endpoint_message: 'J54LS6YyJPoseqFS|J55VZ6U6ZyFDNeuv',
+    example_endpoint_signature: 'H18WE4MugDNoWZIf9jU0njhQptdUyBDUf7lToG9bpMKmeJK0lOoABaDs5bKnohSuZ0e9gnSco5OL9lXdKU7gP5E=',
 }
