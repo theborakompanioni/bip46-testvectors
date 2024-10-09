@@ -31,6 +31,15 @@ export default {
     second_scriptPubKey: '0020b8f898643991608524ed04e0c6779f632a57f1ffa3a3a306cd81432c5533e9ae',
     second_address: 'bc1qhrufsepej9sg2f8dqnsvvaulvv490u0l5w36xpkds9pjc4fnaxhq7pcm4h',
 
+    // last timelocked address = m/84'/0'/0'/2/959
+    last_derived_private_key: 'L5Z9DDMnj5RZMyyPiQLCvN48Xt7GGmev6cjvJXD8uz5EqiY8trNJ',
+    last_derived_public_key: '0308c5751121b1ae5c973cdc7071312f6fc10ab864262f0cbd8134f056166e50f3',
+    last_unix_locktime: 4099766400,
+    last_string_locktime: '2099-12-01 00:00:00',
+    last_redeemscript: '0580785df400b175210308c5751121b1ae5c973cdc7071312f6fc10ab864262f0cbd8134f056166e50f3ac',
+    last_scriptPubKey: '0020803268e042008737cf439748cbb5a4449e311da9aa64ae3ac56d84d059654f85',
+    last_address: 'bc1qsqex3czzqzrn0n6rjayvhddygj0rz8df4fj2uwk9dkzdqkt9f7zs5c493u',
+
     // Test certificate and endpoint signing using the first timelocked address = m/84'/0'/0'/2/0 (see above)
     example_bond_certificate_private_key: 'KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d',
     example_bond_certificate_public_key: '0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c',

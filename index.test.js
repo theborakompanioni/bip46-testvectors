@@ -41,6 +41,19 @@ describe('BIP-0046', () => {
         expect(bytesToHex(derivedKey.privateKey)).toBe('29c2f965ba6375d902c2e800550b7bd8d9b46b6ba9a55edcd5f6811dc97b9b48')
         expect(bytesToHex(derivedKey.publicKey)).toBe(TEST_VECTORS.second_derived_public_key)
     })
+
+    it(`should verify keys (m/84'/0'/0'/2/959)`, async () => {
+        const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
+
+        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/959`)
+        expect(wif.encode({
+            version: parseInt('0x80'),
+            privateKey: derivedKey.privateKey,
+            compressed: true
+        })).toBe(TEST_VECTORS.last_derived_private_key)
+        expect(bytesToHex(derivedKey.privateKey)).toBe('f8b20a5e63f6ecce5497ad21c6e8d3878d26e8c7685729152b2df747cb038175')
+        expect(bytesToHex(derivedKey.publicKey)).toBe(TEST_VECTORS.last_derived_public_key)
+    })
   
     it(`should verify pubkey from private key (m/84'/0'/0'/2/0)`, () => {
         const privateKey = wif.decode(TEST_VECTORS.first_derived_private_key).privateKey
