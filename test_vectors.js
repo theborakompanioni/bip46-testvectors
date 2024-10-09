@@ -22,6 +22,15 @@ export default {
     first_cert_p2pkh_address: '16vmiGpY1rEaYnpGgtG7FZgr2uFCpeDgV6',
     first_cert_signature: 'H2b/90XcKnIU/D1nSCPhk8OcxrHebMCr4Ok2d2yDnbKDTSThNsNKA64CT4v2kt+xA1JmGRG/dMnUUH1kKqCVSHo=',
 
+    // 2nd timelocked address = m/84'/0'/0'/2/1
+    second_derived_private_key: 'KxctaFBzetyc9KXeUr6jxESCZiCEXRuwnQMw7h7hroP6MqnWN6Pf',
+    second_derived_public_key: '02599f6db8b33265a44200fef0be79c927398ed0b46c6a82fa6ddaa5be2714002d',
+    second_unix_locktime: 1580515200,
+    second_string_locktime: '2020-02-01 00:00:00',
+    second_redeemscript: '0480bf345eb1752102599f6db8b33265a44200fef0be79c927398ed0b46c6a82fa6ddaa5be2714002dac',
+    second_scriptPubKey: '0020b8f898643991608524ed04e0c6779f632a57f1ffa3a3a306cd81432c5533e9ae',
+    second_address: 'bc1qhrufsepej9sg2f8dqnsvvaulvv490u0l5w36xpkds9pjc4fnaxhq7pcm4h',
+
     // Test certificate and endpoint signing using the first timelocked address = m/84'/0'/0'/2/0 (see above)
     example_bond_certificate_private_key: 'KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d',
     example_bond_certificate_public_key: '0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c',
