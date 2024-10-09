@@ -5,7 +5,16 @@ import { HDKey } from '@scure/bip32'
 import { bytesToHex } from '@noble/hashes/utils'
 import { networks } from 'bitcoinjs-lib'
 import * as wif from 'wif'
-import { locktimeToIndexFloored, locktimeToIndex, indexToLocktime, timelockedAddressFromLocktimeAndPublicKey, recoverPublicKey, sign, __armorMessageHash } from './utils'
+import { 
+    indexFromYearAndMonth, 
+    indexFromLocktimeUnsafe, 
+    indexFromLocktime, 
+    indexToLocktime, 
+    timelockedAddressFromLocktimeAndPublicKey, 
+    recoverPublicKey, 
+    sign,
+    __armorMessageHash
+} from './utils'
 import TEST_VECTORS from './test_vectors'
 
 describe('BIP-0046', () => {
@@ -43,8 +52,9 @@ describe('BIP-0046', () => {
         const index = 0
         const locktime = indexToLocktime(index)
         expect(locktime).toBe(TEST_VECTORS.first_unix_locktime)
-        expect(locktimeToIndex(locktime)).toBe(index)
-        expect(locktimeToIndexFloored(locktime)).toBe(index)
+        expect(indexFromLocktime(locktime)).toBe(index)
+        expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
+        expect(indexFromYearAndMonth(2020, 0)).toBe(index)
 
         const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
         const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey)
@@ -71,8 +81,9 @@ describe('BIP-0046', () => {
         const index = 1
         const locktime = indexToLocktime(index)
         expect(locktime).toBe(TEST_VECTORS.second_unix_locktime)
-        expect(locktimeToIndex(locktime)).toBe(index)
-        expect(locktimeToIndexFloored(locktime)).toBe(index)
+        expect(indexFromLocktime(locktime)).toBe(index)
+        expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
+        expect(indexFromYearAndMonth(2020, 1)).toBe(index)
 
         const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
         const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey)
@@ -99,8 +110,9 @@ describe('BIP-0046', () => {
         const index = 959
         const locktime = indexToLocktime(index)
         expect(locktime).toBe(TEST_VECTORS.last_unix_locktime)
-        expect(locktimeToIndex(locktime)).toBe(index)
-        expect(locktimeToIndexFloored(locktime)).toBe(index)
+        expect(indexFromLocktime(locktime)).toBe(index)
+        expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
+        expect(indexFromYearAndMonth(2099, 11)).toBe(index)
 
         const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
         const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey)

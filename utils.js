@@ -14,7 +14,7 @@ const indexToLocktime = (index) => {
     return Date.UTC(year, month - 1, day, 0, 0, 0, 0) / 1_000
 }
 
-const locktimeToIndex = (locktime) => {
+const indexFromLocktime = (locktime) => {
     const date = new Date(locktime * 1_000)
     if (date.getUTCFullYear() < 2020 || date.getUTCFullYear() > 2099) {
         throw new Error(`Unexpected value of date: Year (UTC) must be between 2020 and 2099, got ${date.getUTCFullYear()}`)
@@ -29,14 +29,21 @@ const locktimeToIndex = (locktime) => {
     return (date.getUTCFullYear() - 2020) * 12 + date.getUTCMonth()
 }
 
-const locktimeToIndexFloored = (locktime) => {
-    const date = new Date(locktime * 1_000)
+const indexFromYearAndMonth = (year, month) => {
+    const date = new Date()
+    date.setUTCFullYear(year)
+    date.setUTCMonth(month)
     date.setUTCDate(1)
     date.setUTCHours(0)
     date.setUTCMinutes(0)
     date.setUTCSeconds(0)
     date.setUTCMilliseconds(0)
-    return locktimeToIndex(date.getTime() / 1_000)
+    return indexFromLocktime(date.getTime() / 1_000)
+}
+
+const indexFromLocktimeUnsafe = (locktime) => {
+    const date = new Date(locktime * 1_000)
+    return indexFromYearAndMonth(date.getUTCFullYear(), date.getUTCMonth())
 }
 
 const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, network) => {   
@@ -141,8 +148,9 @@ const recoverPublicKey = (message, signature) => {
 
 export {
     indexToLocktime,
-    locktimeToIndexFloored,
-    locktimeToIndex,
+    indexFromYearAndMonth,
+    indexFromLocktime,
+    indexFromLocktimeUnsafe,
     timelockedAddressFromLocktimeAndPublicKey,
     armorMessageHash as __armorMessageHash,
     recoverPublicKey,
