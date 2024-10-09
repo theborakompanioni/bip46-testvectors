@@ -14,6 +14,31 @@ const indexToLocktime = (index) => {
     return Date.UTC(year, month - 1, day, 0, 0, 0, 0) / 1_000
 }
 
+const locktimeToIndex = (locktime) => {
+    const date = new Date(locktime * 1_000)
+    if (date.getUTCFullYear() < 2020 || date.getUTCFullYear() > 2099) {
+        throw new Error(`Unexpected value of date: Year (UTC) must be between 2020 and 2099, got ${date.getUTCFullYear()}`)
+    }
+    if (date.getUTCDate() != 1) {
+        throw new Error(`Unexpected value of date: Day (UTC) must be 1, got ${date.getUTCDate()}`)
+    }
+    if (date.getUTCHours() !== 0 || date.getUTCMinutes() !== 0 || date.getUTCSeconds() !== 0 || date.getUTCMilliseconds() !== 0) {
+        throw new Error(`Unexpected value of date: Time (UTC) must be at midnight, got ${date.toUTCString()}`)
+    }
+
+    return (date.getUTCFullYear() - 2020) * 12 + date.getUTCMonth()
+}
+
+const locktimeToIndexFloored = (locktime) => {
+    const date = new Date(locktime * 1_000)
+    date.setUTCDate(1)
+    date.setUTCHours(0)
+    date.setUTCMinutes(0)
+    date.setUTCSeconds(0)
+    date.setUTCMilliseconds(0)
+    return locktimeToIndex(date.getTime() / 1_000)
+}
+
 const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, network) => {   
     // If the nLockTime is less than 500 million, it is interpreted as a blockheight.
     // If the nLockTime is 500 million or more, it is interpreted as a UNIX timestamp.
@@ -116,6 +141,8 @@ const recoverPublicKey = (message, signature) => {
 
 export {
     indexToLocktime,
+    locktimeToIndexFloored,
+    locktimeToIndex,
     timelockedAddressFromLocktimeAndPublicKey,
     armorMessageHash as __armorMessageHash,
     recoverPublicKey,
