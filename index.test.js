@@ -29,13 +29,13 @@ describe('BIP-0046', () => {
         expect(recoveredPubkey.toHex()).toBe(TEST_VECTORS.first_derived_public_key)
     })
 
-    /*it(`should verify signature for example endpoint`, async () => {
+    it(`should verify signature for example endpoint`, async () => {
         const message = TEST_VECTORS.example_endpoint_message
         const privateKey = wif.decode(TEST_VECTORS.example_bond_certificate_private_key).privateKey
         const signature = await sign(message, privateKey)
 
-        expect(base64.encode(signature.toCompactRawBytes())).toBe(TEST_VECTORS.example_endpoint_signature)
-    })*/
+        expect(base64.encode(signature)).toBe(TEST_VECTORS.example_endpoint_signature)
+    })
 
     it(`should recover public key from signature for example endpoint`, () => {
         const message = TEST_VECTORS.example_endpoint_message
