@@ -3,7 +3,7 @@ import { base64 } from '@scure/base'
 import { HDKey } from '@scure/bip32'
 import * as bip39 from '@scure/bip39'
 import * as secp from '@noble/secp256k1'
-import { bytesToHex } from '@noble/hashes/utils'
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 import { networks } from 'bitcoinjs-lib'
 import * as wif from 'wif'
 import {
@@ -15,6 +15,7 @@ import {
   timelockedAddressFromLocktimeAndPublicKey,
   recoverPublicKey,
   sign,
+  verify,
   __armorMessageHash,
 } from './utils'
 import TEST_VECTORS from '../test_vectors'
@@ -51,11 +52,9 @@ describe('BIP-0046', async () => {
       const privateKey = wif.decode(
         TEST_VECTORS.first_derived_private_key,
       ).privateKey
-      const recoveredPubkey = secp.getPublicKey(privateKey)
+      const publicKey = secp.getPublicKey(privateKey)
 
-      expect(bytesToHex(recoveredPubkey)).toBe(
-        TEST_VECTORS.first_derived_public_key,
-      )
+      expect(bytesToHex(publicKey)).toBe(TEST_VECTORS.first_derived_public_key)
     })
 
     it(`should verify timelocked address (m/84'/0'/0'/2/0)`, () => {
@@ -167,6 +166,7 @@ describe('BIP-0046', async () => {
       const signature = await sign(message, privateKey)
 
       expect(base64.encode(signature)).toBe(TEST_VECTORS.first_cert_signature)
+      expect(verify(message, signature)).toBe(true)
     })
 
     it(`should verify message hash for example bond certificate`, () => {
@@ -187,6 +187,7 @@ describe('BIP-0046', async () => {
       expect(base64.encode(signature)).toBe(
         TEST_VECTORS.example_bond_certificate_signature,
       )
+      expect(verify(message, signature)).toBe(true)
     })
 
     it(`should recover public key from signature for example bond certificate`, () => {
@@ -211,6 +212,7 @@ describe('BIP-0046', async () => {
       expect(base64.encode(signature)).toBe(
         TEST_VECTORS.example_endpoint_signature,
       )
+      expect(verify(message, signature)).toBe(true)
     })
 
     it(`should recover public key from signature for example endpoint`, () => {

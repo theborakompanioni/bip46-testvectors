@@ -170,6 +170,34 @@ const __toSigRecoveryType = (valueString) => {
   )
 }
 
+const __toSignatureWithRecovery = (signature) => {
+  if (signature.length !== 65) {
+    throw new Error(
+      `Signature length out of range: Must be 65 bytes, got ${signature.length}`,
+    )
+  }
+
+  const headerInt = Buffer.from(signature.subarray(0, 1)).readInt8(0)
+  const sigBytes = signature.subarray(1, 65)
+
+  const recoveryId = ((headerInt) => {
+    if (headerInt < 27 || headerInt > 42) {
+      throw new Error(
+        `Header byte out of range: Must be between 27 and 42, got ${headerInt}`,
+      )
+    }
+
+    if (headerInt >= 39) return headerInt - 12 - 27
+    if (headerInt >= 35) return headerInt - 8 - 27
+    if (headerInt >= 31) return headerInt - 4 - 27
+    return headerInt - 27
+  })(headerInt)
+
+  return secp.Signature.fromCompact(sigBytes)
+    .addRecoveryBit(recoveryId)
+    .assertValidity()
+}
+
 const sign = async (message, privateKey, typeString) => {
   const sig_recovery_type = __toSigRecoveryType(typeString)
   const message_hash = armorMessageHash(message)
@@ -196,36 +224,27 @@ const sign = async (message, privateKey, typeString) => {
   return signature_with_header
 }
 
+const verify = (message, signature) => {
+  const sigWithRecovery = __toSignatureWithRecovery(signature)
+  const messageHash = armorMessageHash(message)
+  const publicKey = __recoverPublicKeyFromSignatureWithRecovery(
+    message,
+    sigWithRecovery,
+  )
+  return secp.verify(sigWithRecovery, messageHash, publicKey)
+}
+
+const __recoverPublicKeyFromSignatureWithRecovery = (
+  message,
+  sigWithRecovery,
+) => {
+  const messageHash = armorMessageHash(message)
+  return sigWithRecovery.recoverPublicKey(messageHash)
+}
+
 const recoverPublicKey = (message, signature) => {
-  if (signature.length !== 65) {
-    throw new Error(
-      `Signature length out of range: Must be 65 bytes, got ${signature.length}`,
-    )
-  }
-
-  const headerInt = Buffer.from(signature.subarray(0, 1)).readInt8(0)
-  const sigBytes = signature.subarray(1, 65)
-
-  const recoveryId = ((headerInt) => {
-    if (headerInt < 27 || headerInt > 42) {
-      throw new Error(
-        `Header byte out of range: Must be between 27 and 42, got ${headerInt}`,
-      )
-    }
-
-    if (headerInt >= 39) return headerInt - 12 - 27
-    if (headerInt >= 35) return headerInt - 8 - 27
-    if (headerInt >= 31) return headerInt - 4 - 27
-    return headerInt - 27
-  })(headerInt)
-
-  const sigWithRecovery = secp.Signature.fromCompact(sigBytes)
-    .addRecoveryBit(recoveryId)
-    .assertValidity()
-
-  const message_hash = armorMessageHash(message)
-
-  return sigWithRecovery.recoverPublicKey(message_hash)
+  const sigWithRecovery = __toSignatureWithRecovery(signature)
+  return __recoverPublicKeyFromSignatureWithRecovery(message, sigWithRecovery)
 }
 
 export {
@@ -238,4 +257,5 @@ export {
   armorMessageHash as __armorMessageHash,
   recoverPublicKey,
   sign,
+  verify,
 }
