@@ -6,12 +6,13 @@ import { bytesToHex } from '@noble/hashes/utils'
 import { networks } from 'bitcoinjs-lib'
 import * as wif from 'wif'
 import { 
-    indexFromYearAndMonth, 
-    indexFromLocktimeUnsafe, 
-    indexFromLocktime, 
-    indexToLocktime, 
-    timelockedAddressFromLocktimeAndPublicKey, 
-    recoverPublicKey, 
+    indexFromYearAndMonth,
+    indexFromLocktimeUnsafe,
+    indexFromLocktime,
+    indexToLocktime,
+    indexToDerivationPath,
+    timelockedAddressFromLocktimeAndPublicKey,
+    recoverPublicKey,
     sign,
     __armorMessageHash
 } from './utils'
@@ -56,7 +57,7 @@ describe('BIP-0046', () => {
         expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
         expect(indexFromYearAndMonth(2020, 0)).toBe(index)
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
+        const derivedKey = hdkey.derive(indexToDerivationPath(index))
         const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey)
 
         expect(address).toBe(TEST_VECTORS.first_address)
@@ -65,7 +66,7 @@ describe('BIP-0046', () => {
     it(`should verify keys (m/84'/0'/0'/2/1)`, async () => {
         const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/1`)
+        const derivedKey = hdkey.derive(indexToDerivationPath(1))
         expect(wif.encode({
             version: networks.bitcoin.wif /*parseInt('0x80')*/,
             privateKey: derivedKey.privateKey,
@@ -85,7 +86,7 @@ describe('BIP-0046', () => {
         expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
         expect(indexFromYearAndMonth(2020, 1)).toBe(index)
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
+        const derivedKey = hdkey.derive(indexToDerivationPath(index))
         const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey)
 
         expect(address).toBe(TEST_VECTORS.second_address)
@@ -94,7 +95,7 @@ describe('BIP-0046', () => {
     it(`should verify keys (m/84'/0'/0'/2/959)`, async () => {
         const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/959`)
+        const derivedKey = hdkey.derive(indexToDerivationPath(959))
         expect(wif.encode({
             version: networks.bitcoin.wif /*parseInt('0x80')*/,
             privateKey: derivedKey.privateKey,
@@ -114,7 +115,7 @@ describe('BIP-0046', () => {
         expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
         expect(indexFromYearAndMonth(2099, 11)).toBe(index)
 
-        const derivedKey = hdkey.derive(`m/84'/0'/0'/2/${index}`)
+        const derivedKey = hdkey.derive(indexToDerivationPath(index))
         const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey)
 
         expect(address).toBe(TEST_VECTORS.last_address)

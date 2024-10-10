@@ -4,10 +4,14 @@ import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils'
 import { networks, script, opcodes, payments } from 'bitcoinjs-lib'
 import * as varint from 'varuint-bitcoin'
 
-const indexToLocktime = (index) => {
+const __checkIndex = (index) => {
     if (index < 0 || index > 959) {
         throw new Error(`Unexpected value of index: Must be between 0 and 959, got ${index}`)
     }
+}
+
+const indexToLocktime = (index) => {
+    __checkIndex(index)
     const year = 2020 + Math.floor(index / 12)
     const month = 1 + index % 12
     const day = 1
@@ -57,6 +61,16 @@ const __toNetwork = (valueString) => {
         throw new Error(`Unexpected value of signature type: Must be one of ${Object.keys(NETWORKS)}, got ${valueString}`)
     }
     return (valueString && NETWORKS[valueString]) || NETWORKS['bitcoin']
+}
+
+const DERIVATION_PATH_MAINNET = `m/84'/0'/0'/2`
+const DERIVATION_PATH_OTHERS = `m/84'/1'/0'/2`
+
+const indexToDerivationPath = (index, networkString) => {
+    __checkIndex(index)
+    const network = __toNetwork(networkString)
+    const pathPrefix = network === NETWORKS.bitcoin ? DERIVATION_PATH_MAINNET : DERIVATION_PATH_OTHERS
+    return `${pathPrefix}/${index}`
 }
 
 const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, networkString) => {   
@@ -165,6 +179,7 @@ export {
     indexFromYearAndMonth,
     indexFromLocktime,
     indexFromLocktimeUnsafe,
+    indexToDerivationPath,
     timelockedAddressFromLocktimeAndPublicKey,
     armorMessageHash as __armorMessageHash,
     recoverPublicKey,
