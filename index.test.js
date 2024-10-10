@@ -17,6 +17,7 @@ import {
     __armorMessageHash
 } from './utils'
 import TEST_VECTORS from './test_vectors'
+import { describe } from 'node:test'
 
 describe('BIP-0046', () => {
     it(`should verify xpriv/xpub`, async () => {
@@ -175,5 +176,39 @@ describe('BIP-0046', () => {
         const recoveredPubkey = recoverPublicKey(message, signatures)
 
         expect(recoveredPubkey.toHex()).toBe(TEST_VECTORS.example_bond_certificate_public_key)
+    })
+
+    // ------------------------------------------------------------------------
+    // custom testnet vectors
+    describe('testnet', async () => {
+        const NETWORK = 'testnet'
+        const hdkey = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
+
+        it(`should verify timelocked address (m/84'/1'/0'/2/0)`, async () => {
+            const index = 0
+            const locktime = indexToLocktime(index)
+            const derivedKey = hdkey.derive(indexToDerivationPath(index, NETWORK))
+            const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey, NETWORK)
+
+            expect(address).toBe(TEST_VECTORS.testnet_address0)
+        })
+
+        it(`should verify timelocked address (m/84'/1'/0'/2/1)`, async () => {
+            const index = 1
+            const locktime = indexToLocktime(index)
+            const derivedKey = hdkey.derive(indexToDerivationPath(index, NETWORK))
+            const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey, NETWORK)
+
+            expect(address).toBe(TEST_VECTORS.testnet_address1)
+        })
+
+        it(`should verify timelocked address (m/84'/1'/0'/2/959)`, async () => {
+            const index = 959
+            const locktime = indexToLocktime(index)
+            const derivedKey = hdkey.derive(indexToDerivationPath(index, NETWORK))
+            const address = timelockedAddressFromLocktimeAndPublicKey(locktime, derivedKey.publicKey, NETWORK)
+
+            expect(address).toBe(TEST_VECTORS.testnet_address959)
+        })
     })
 })

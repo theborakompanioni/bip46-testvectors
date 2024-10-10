@@ -49,4 +49,9 @@ export default {
     // example endpoint signing two IRC nicknames (used in JoinMarket)
     example_endpoint_message: 'J54LS6YyJPoseqFS|J55VZ6U6ZyFDNeuv',
     example_endpoint_signature: 'H18WE4MugDNoWZIf9jU0njhQptdUyBDUf7lToG9bpMKmeJK0lOoABaDs5bKnohSuZ0e9gnSco5OL9lXdKU7gP5E=',
+
+    // custom testnet vectors
+    testnet_address0: 'tb1q7war3lusq3ez633rzzfkp75unfcgrqqcu80sgp0ellhrdvkzxh5srftzav',
+    testnet_address1: 'tb1qrl9wxkukx9u79rlm35nn78ph78ksx4fu5sp2v7xdheqt63n0ta4spml5ux',
+    testnet_address959: 'tb1q6rlcknptmqhf4w20928tpz6px4y70960gyupd029c7vx7kdjwt0qcressz',
 }
