@@ -85,10 +85,7 @@ const armorMessage = (message) => {
     return prefixed_message_raw
 }
 
-const armorMessageHash = (message) => {
-    const prefixed_message_raw = armorMessage(message)
-    return sha256(sha256(prefixed_message_raw))
-}
+const armorMessageHash = (message) => sha256(sha256(armorMessage(message)))
 
 const SIG_RECOVERY_TYPE = {
     'P2PKH_uncompressed': 27,
@@ -97,15 +94,22 @@ const SIG_RECOVERY_TYPE = {
     'Segwit_Bech32': 39
 }
 
-const sign = async (message, privateKey, type) => {
+const __toSigRecoveryType = (typeString) => {
+    if (typeString !== undefined && !Object.keys(SIG_RECOVERY_TYPE).includes(typeString)) {
+        throw new Error(`Unexpected value of signature type: Must be one of ${Object.keys(SIG_RECOVERY_TYPE)}, got ${typeString}`)
+    }
+    return (typeString && SIG_RECOVERY_TYPE[typeString]) || SIG_RECOVERY_TYPE['P2PKH_compressed']
+}
+
+
+const sign = async (message, privateKey, typeString) => {
+    const sig_recovery_type = __toSigRecoveryType(typeString)
     const message_hash = armorMessageHash(message)
 
     const signature = await secp.signAsync(message_hash, privateKey)
     const signature_bytes = signature.toCompactRawBytes()
 
-    const _type = (type && SIG_RECOVERY_TYPE[type]) || SIG_RECOVERY_TYPE['P2PKH_compressed']
-
-    const header_number = _type + signature.recovery
+    const header_number = sig_recovery_type + signature.recovery
 
     const header_bytes = hexToBytes(Number(header_number).toString(16))
 
