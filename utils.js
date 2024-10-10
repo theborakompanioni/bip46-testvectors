@@ -46,7 +46,20 @@ const indexFromLocktimeUnsafe = (locktime) => {
     return indexFromYearAndMonth(date.getUTCFullYear(), date.getUTCMonth())
 }
 
-const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, network) => {   
+const NETWORKS = {
+    'bitcoin': networks.bitcoin,
+    'testnet': networks.testnet,
+    'regtest': networks.regtest,
+}
+
+const __toNetwork = (valueString) => {
+    if (valueString !== undefined && !Object.keys(NETWORKS).includes(valueString)) {
+        throw new Error(`Unexpected value of signature type: Must be one of ${Object.keys(NETWORKS)}, got ${valueString}`)
+    }
+    return (valueString && NETWORKS[valueString]) || NETWORKS['bitcoin']
+}
+
+const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, networkString) => {   
     // If the nLockTime is less than 500 million, it is interpreted as a blockheight.
     // If the nLockTime is 500 million or more, it is interpreted as a UNIX timestamp.
     if (nLockTime < 500_000_000) {
@@ -55,10 +68,7 @@ const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, network
     if (publicKey.length !== 33) {
         throw new Error(`Unexpected length of public key: Must be 33 bytes, got ${publicKey.length}`)
     }
-    if (network !== 'bitcoin' && network !== 'testnet' && network !== 'regtest' && network !== undefined) {
-        throw new Error(`Unexpected value of network: Must be one of "bitcoin", "testnet" or "regtest", got ${nLockTime}`)
-    }
-    const _network = network === 'regtest' ? networks.regtest : (network === 'testnet' ? networks.testnet : networks.bitcoin)
+    const network = __toNetwork(networkString)
     
     // <timelock> OP_CHECKLOCKTIMEVERIFY OP_DROP <derived_key> OP_CHECKSIG
     const locking_script = script.compile([
@@ -68,7 +78,7 @@ const timelockedAddressFromLocktimeAndPublicKey = (nLockTime, publicKey, network
         publicKey,
         opcodes.OP_CHECKSIG,
       ])
-    const p2wsh = payments.p2wsh({ redeem: { output: locking_script, network: _network }, network: _network })
+    const p2wsh = payments.p2wsh({ redeem: { output: locking_script, network }, network })
     return p2wsh.address
 }
 
@@ -94,11 +104,11 @@ const SIG_RECOVERY_TYPE = {
     'Segwit_Bech32': 39
 }
 
-const __toSigRecoveryType = (typeString) => {
-    if (typeString !== undefined && !Object.keys(SIG_RECOVERY_TYPE).includes(typeString)) {
-        throw new Error(`Unexpected value of signature type: Must be one of ${Object.keys(SIG_RECOVERY_TYPE)}, got ${typeString}`)
+const __toSigRecoveryType = (valueString) => {
+    if (valueString !== undefined && !Object.keys(SIG_RECOVERY_TYPE).includes(valueString)) {
+        throw new Error(`Unexpected value of signature type: Must be one of ${Object.keys(SIG_RECOVERY_TYPE)}, got ${valueString}`)
     }
-    return (typeString && SIG_RECOVERY_TYPE[typeString]) || SIG_RECOVERY_TYPE['P2PKH_compressed']
+    return (valueString && SIG_RECOVERY_TYPE[valueString]) || SIG_RECOVERY_TYPE['P2PKH_compressed']
 }
 
 
