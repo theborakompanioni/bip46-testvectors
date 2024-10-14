@@ -75,7 +75,7 @@ const __toNetwork = (valueString) => {
     !Object.keys(NETWORKS).includes(valueString)
   ) {
     throw new Error(
-      `Unexpected value of signature type: Must be one of ${Object.keys(NETWORKS)}, got ${valueString}`,
+      `Unexpected value of network type: Must be one of ${Object.keys(NETWORKS)}, got ${valueString}`,
     )
   }
   return (valueString && NETWORKS[valueString]) || NETWORKS['bitcoin']
