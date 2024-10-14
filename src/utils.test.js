@@ -1,4 +1,3 @@
-import { describe } from 'node:test'
 import { base64 } from '@scure/base'
 import { HDKey } from '@scure/bip32'
 import * as bip39 from '@scure/bip39'
@@ -20,19 +19,20 @@ import {
 } from './utils'
 import TEST_VECTORS from '../test_vectors'
 
-describe('BIP-0046', async () => {
-  const HD_KEY = HDKey.fromMasterSeed(
-    await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic),
-  )
+const testSeed = async () =>
+  HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))
 
-  it(`should verify xpriv/xpub`, () => {
-    expect(HD_KEY.privateExtendedKey).toBe(TEST_VECTORS.rootpriv)
-    expect(HD_KEY.publicExtendedKey).toBe(TEST_VECTORS.rootpub)
+describe('BIP-0046', () => {
+  it(`should verify xpriv/xpub`, async () => {
+    const hdKey = await testSeed()
+    expect(hdKey.privateExtendedKey).toBe(TEST_VECTORS.rootpriv)
+    expect(hdKey.publicExtendedKey).toBe(TEST_VECTORS.rootpub)
   })
 
-  describe('mainnet', async () => {
-    it(`should verify keys (m/84'/0'/0'/2/0)`, () => {
-      const derivedKey = HD_KEY.derive(`m/84'/0'/0'/2/0`)
+  describe('mainnet', () => {
+    it(`should verify keys (m/84'/0'/0'/2/0)`, async () => {
+      const hdKey = await testSeed()
+      const derivedKey = hdKey.derive(`m/84'/0'/0'/2/0`)
       expect(
         wif.encode({
           version: networks.bitcoin.wif /*parseInt('0x80')*/,
@@ -57,7 +57,8 @@ describe('BIP-0046', async () => {
       expect(bytesToHex(publicKey)).toBe(TEST_VECTORS.first_derived_public_key)
     })
 
-    it(`should verify timelocked address (m/84'/0'/0'/2/0)`, () => {
+    it(`should verify timelocked address (m/84'/0'/0'/2/0)`, async () => {
+      const hdKey = await testSeed()
       const index = 0
       const locktime = indexToLocktime(index)
       expect(locktime).toBe(TEST_VECTORS.first_unix_locktime)
@@ -65,7 +66,7 @@ describe('BIP-0046', async () => {
       expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
       expect(indexFromYearAndMonth(2020, 0)).toBe(index)
 
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(index))
+      const derivedKey = hdKey.derive(indexToDerivationPath(index))
       const address = timelockedAddressFromLocktimeAndPublicKey(
         locktime,
         derivedKey.publicKey,
@@ -74,8 +75,9 @@ describe('BIP-0046', async () => {
       expect(address).toBe(TEST_VECTORS.first_address)
     })
 
-    it(`should verify keys (m/84'/0'/0'/2/1)`, () => {
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(1))
+    it(`should verify keys (m/84'/0'/0'/2/1)`, async () => {
+      const hdKey = await testSeed()
+      const derivedKey = hdKey.derive(indexToDerivationPath(1))
       expect(
         wif.encode({
           version: networks.bitcoin.wif /*parseInt('0x80')*/,
@@ -91,7 +93,8 @@ describe('BIP-0046', async () => {
       )
     })
 
-    it(`should verify timelocked address (m/84'/0'/0'/2/1)`, () => {
+    it(`should verify timelocked address (m/84'/0'/0'/2/1)`, async () => {
+      const hdKey = await testSeed()
       const index = 1
       const locktime = indexToLocktime(index)
       expect(locktime).toBe(TEST_VECTORS.second_unix_locktime)
@@ -99,7 +102,7 @@ describe('BIP-0046', async () => {
       expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
       expect(indexFromYearAndMonth(2020, 1)).toBe(index)
 
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(index))
+      const derivedKey = hdKey.derive(indexToDerivationPath(index))
       const address = timelockedAddressFromLocktimeAndPublicKey(
         locktime,
         derivedKey.publicKey,
@@ -108,8 +111,9 @@ describe('BIP-0046', async () => {
       expect(address).toBe(TEST_VECTORS.second_address)
     })
 
-    it(`should verify keys (m/84'/0'/0'/2/959)`, () => {
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(959))
+    it(`should verify keys (m/84'/0'/0'/2/959)`, async () => {
+      const hdKey = await testSeed()
+      const derivedKey = hdKey.derive(indexToDerivationPath(959))
       expect(
         wif.encode({
           version: networks.bitcoin.wif /*parseInt('0x80')*/,
@@ -125,7 +129,8 @@ describe('BIP-0046', async () => {
       )
     })
 
-    it(`should verify timelocked address (m/84'/0'/0'/2/959)`, () => {
+    it(`should verify timelocked address (m/84'/0'/0'/2/959)`, async () => {
+      const hdKey = await testSeed()
       const index = 959
       const locktime = indexToLocktime(index)
       expect(locktime).toBe(TEST_VECTORS.last_unix_locktime)
@@ -133,7 +138,7 @@ describe('BIP-0046', async () => {
       expect(indexFromLocktimeUnsafe(locktime)).toBe(index)
       expect(indexFromYearAndMonth(2099, 11)).toBe(index)
 
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(index))
+      const derivedKey = hdKey.derive(indexToDerivationPath(index))
       const address = timelockedAddressFromLocktimeAndPublicKey(
         locktime,
         derivedKey.publicKey,
@@ -231,10 +236,11 @@ describe('BIP-0046', async () => {
   describe('testnet', () => {
     const NETWORK = 'testnet'
 
-    it(`should verify timelocked address (m/84'/1'/0'/2/0)`, () => {
+    it(`should verify timelocked address (m/84'/1'/0'/2/0)`, async () => {
+      const hdKey = await testSeed()
       const index = 0
       const locktime = indexToLocktime(index)
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(index, NETWORK))
+      const derivedKey = hdKey.derive(indexToDerivationPath(index, NETWORK))
       const address = timelockedAddressFromLocktimeAndPublicKey(
         locktime,
         derivedKey.publicKey,
@@ -244,10 +250,11 @@ describe('BIP-0046', async () => {
       expect(address).toBe(TEST_VECTORS.testnet_address0)
     })
 
-    it(`should verify timelocked address (m/84'/1'/0'/2/1)`, () => {
+    it(`should verify timelocked address (m/84'/1'/0'/2/1)`, async () => {
+      const hdKey = await testSeed()
       const index = 1
       const locktime = indexToLocktime(index)
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(index, NETWORK))
+      const derivedKey = hdKey.derive(indexToDerivationPath(index, NETWORK))
       const address = timelockedAddressFromLocktimeAndPublicKey(
         locktime,
         derivedKey.publicKey,
@@ -257,10 +264,11 @@ describe('BIP-0046', async () => {
       expect(address).toBe(TEST_VECTORS.testnet_address1)
     })
 
-    it(`should verify timelocked address (m/84'/1'/0'/2/959)`, () => {
+    it(`should verify timelocked address (m/84'/1'/0'/2/959)`, async () => {
+      const hdKey = await testSeed()
       const index = 959
       const locktime = indexToLocktime(index)
-      const derivedKey = HD_KEY.derive(indexToDerivationPath(index, NETWORK))
+      const derivedKey = hdKey.derive(indexToDerivationPath(index, NETWORK))
       const address = timelockedAddressFromLocktimeAndPublicKey(
         locktime,
         derivedKey.publicKey,
