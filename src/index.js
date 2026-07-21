@@ -6,6 +6,7 @@ import {
   timelockedAddressFromLocktimeAndPublicKey,
 } from './utils.js'
 
+const network = 'regtest'
 const mnemonic =
   'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
 
@@ -14,11 +15,12 @@ const mnemonic =
 
   for (let index = 0; index < 960; index++) {
     const locktime = indexToLocktime(index)
-    const path = indexToDerivationPath(index)
+    const path = indexToDerivationPath(index, network)
     const derivedKey = HD_KEY.derive(path)
     const address = timelockedAddressFromLocktimeAndPublicKey(
       locktime,
       derivedKey.publicKey,
+      network,
     )
     console.log(`${index}: ${address}`)
   }

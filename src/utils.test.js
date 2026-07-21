@@ -278,4 +278,52 @@ describe('BIP-0046', () => {
       expect(address).toBe(TEST_VECTORS.testnet_address959)
     })
   })
+
+  // ------------------------------------------------------------------------
+  // custom regtest vectors
+  describe('regtest', () => {
+    const NETWORK = 'regtest'
+
+    it(`should verify timelocked address (m/84'/1'/0'/2/0)`, async () => {
+      const hdKey = await testSeed()
+      const index = 0
+      const locktime = indexToLocktime(index)
+      const derivedKey = hdKey.derive(indexToDerivationPath(index, NETWORK))
+      const address = timelockedAddressFromLocktimeAndPublicKey(
+        locktime,
+        derivedKey.publicKey,
+        NETWORK,
+      )
+
+      expect(address).toBe(TEST_VECTORS.regtest_address0)
+    })
+
+    it(`should verify timelocked address (m/84'/1'/0'/2/1)`, async () => {
+      const hdKey = await testSeed()
+      const index = 1
+      const locktime = indexToLocktime(index)
+      const derivedKey = hdKey.derive(indexToDerivationPath(index, NETWORK))
+      const address = timelockedAddressFromLocktimeAndPublicKey(
+        locktime,
+        derivedKey.publicKey,
+        NETWORK,
+      )
+
+      expect(address).toBe(TEST_VECTORS.regtest_address1)
+    })
+
+    it(`should verify timelocked address (m/84'/1'/0'/2/959)`, async () => {
+      const hdKey = await testSeed()
+      const index = 959
+      const locktime = indexToLocktime(index)
+      const derivedKey = hdKey.derive(indexToDerivationPath(index, NETWORK))
+      const address = timelockedAddressFromLocktimeAndPublicKey(
+        locktime,
+        derivedKey.publicKey,
+        NETWORK,
+      )
+
+      expect(address).toBe(TEST_VECTORS.regtest_address959)
+    })
+  })
 })

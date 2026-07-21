@@ -65,6 +65,7 @@ const indexFromLocktimeUnsafe = (locktime) => {
 
 const NETWORKS = {
   bitcoin: networks.bitcoin,
+  mainnet: networks.bitcoin,
   testnet: networks.testnet,
   regtest: networks.regtest,
 }

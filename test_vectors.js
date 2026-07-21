@@ -54,4 +54,9 @@ export default {
     testnet_address0: 'tb1q7war3lusq3ez633rzzfkp75unfcgrqqcu80sgp0ellhrdvkzxh5srftzav',
     testnet_address1: 'tb1qrl9wxkukx9u79rlm35nn78ph78ksx4fu5sp2v7xdheqt63n0ta4spml5ux',
     testnet_address959: 'tb1q6rlcknptmqhf4w20928tpz6px4y70960gyupd029c7vx7kdjwt0qcressz',
+
+    // custom regtest vectors
+    regtest_address0: 'bcrt1q7war3lusq3ez633rzzfkp75unfcgrqqcu80sgp0ellhrdvkzxh5swspygk',
+    regtest_address1: 'bcrt1qrl9wxkukx9u79rlm35nn78ph78ksx4fu5sp2v7xdheqt63n0ta4svz4jfu',
+    regtest_address959: 'bcrt1q6rlcknptmqhf4w20928tpz6px4y70960gyupd029c7vx7kdjwt0q46nk9c',
 }
