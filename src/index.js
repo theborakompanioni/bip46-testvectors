@@ -22,6 +22,13 @@ const mnemonic =
       derivedKey.publicKey,
       network,
     )
-    console.log(`${index}: ${address}`)
+
+    const humanReadableTime = new Date(locktime * 1_000).toLocaleDateString(undefined, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    })
+
+    console.log(`#${index} (${locktime}; ${humanReadableTime}): ${address}`)
   }
 })()
