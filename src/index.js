@@ -6,9 +6,16 @@ import {
   timelockedAddressFromLocktimeAndPublicKey,
 } from './utils.js'
 
-const network = 'regtest'
-const mnemonic =
-  'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
+const DEFAULT_NETWORK = 'regtest'
+
+const args = process.argv.slice(2)
+
+const arg = (name, defaultValue) => args.filter(it => it.startsWith(`--${name}=`))
+  .map(it => it.slice(`--${name}=`.length))[0] || defaultValue
+
+const network = arg('network', DEFAULT_NETWORK)
+
+const mnemonic = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about'
 
 ;(async function () {
   const HD_KEY = HDKey.fromMasterSeed(await bip39.mnemonicToSeed(mnemonic))
