@@ -1,6 +1,6 @@
 import * as secp from '@noble/secp256k1'
-import { sha256 } from '@noble/hashes/sha256'
-import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils'
+import { sha256 } from '@noble/hashes/sha2.js'
+import { hexToBytes, utf8ToBytes } from '@noble/hashes/utils.js'
 import { networks, script, opcodes, payments } from 'bitcoinjs-lib'
 import * as varint from 'varuint-bitcoin'
 

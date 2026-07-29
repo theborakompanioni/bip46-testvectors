@@ -2,7 +2,7 @@ import { base64 } from '@scure/base'
 import { HDKey } from '@scure/bip32'
 import * as bip39 from '@scure/bip39'
 import * as secp from '@noble/secp256k1'
-import { bytesToHex } from '@noble/hashes/utils'
+import { bytesToHex } from '@noble/hashes/utils.js'
 import { networks } from 'bitcoinjs-lib'
 import * as wif from 'wif'
 import {
