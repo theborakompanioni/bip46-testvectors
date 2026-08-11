@@ -17,7 +17,7 @@ import {
   verify,
   __armorMessageHash,
 } from './utils'
-import TEST_VECTORS from '../test_vectors'
+import TEST_VECTORS from '../../test_vectors'
 
 const testSeed = async () =>
   HDKey.fromMasterSeed(await bip39.mnemonicToSeed(TEST_VECTORS.mnemonic))

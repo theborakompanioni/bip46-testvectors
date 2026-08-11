@@ -5,7 +5,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/index.js",
+    "start": "npm run start:v2",
+    "start:v1": "node ./src/v1/index.js",
+    "start:v2": "node ./src/v2/index_v2.js",
+    "start:v2:mainnet": "node ./src/v2/index_v2.js --network=mainnet",
     "format": "npm run format:write",
     "format:check": "prettier --check \"./src/**/*.{js,ts,json}\"",
     "format:write": "prettier --write \"./src/**/*.{js,ts,json}\"",
