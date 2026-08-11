@@ -4,7 +4,7 @@ import {
   indexToDerivationPath,
   indexToLocktime,
   timelockedAddressFromLocktimeAndPublicKey,
-} from './utils.js'
+} from './utils_v2.js'
 
 const DEFAULT_NETWORK = 'regtest'
 
@@ -42,6 +42,6 @@ const mnemonic =
       },
     )
 
-    console.log(`#${index} (${locktime}; ${humanReadableTime}): ${address}`)
+    console.log(`${path} (${locktime}; ${humanReadableTime}): ${address}`)
   }
 })()
