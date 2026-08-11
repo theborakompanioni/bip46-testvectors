@@ -3,7 +3,7 @@ import { HDKey } from '@scure/bip32'
 import * as bip39 from '@scure/bip39'
 import * as secp from '@noble/secp256k1'
 import { bytesToHex } from '@noble/hashes/utils.js'
-import { networks } from 'bitcoinjs-lib'
+import { networks, payments } from 'bitcoinjs-lib'
 import * as wif from 'wif'
 import {
   indexFromYearAndMonth,
@@ -155,6 +155,12 @@ describe('BIP-0046', () => {
       expect(recoveredPubkey.toHex()).toBe(
         TEST_VECTORS.first_derived_public_key,
       )
+
+      const { address } = payments.p2pkh({
+        pubkey: Buffer.from(recoveredPubkey.toHex(), 'hex'),
+        network: networks.bitcoin,
+      })
+      expect(address).toBe(TEST_VECTORS.first_cert_p2pkh_address)
     })
 
     it(`should verify message hash for first certificate`, () => {

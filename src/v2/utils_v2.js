@@ -115,7 +115,6 @@ const timelockedAddressFromLocktimeAndPublicKey = (
   const network = __toNetwork(networkString)
 
   // <derived_key> OP_CHECKSIGVERIFY <timelock> OP_CHECKLOCKTIMEVERIFY
-  // <timelock> OP_CHECKLOCKTIMEVERIFY OP_DROP <derived_key> OP_CHECKSIG
   const locking_script = script.compile([
     publicKey,
     opcodes.OP_CHECKSIGVERIFY,
